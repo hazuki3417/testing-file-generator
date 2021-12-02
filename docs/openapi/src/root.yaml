@@ -1,0 +1,176 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: testing-file-generator
+  description: テスト用のダミーファイルを生成するAPI
+  termsOfService: 'https://github.com/hazuki3417/testing-file-generator'
+  contact:
+    email: hazuki3417@gmail.com
+    name: hazuki3417
+  license:
+    name: MIT
+    url: 'https://github.com/hazuki3417/testing-file-generator'
+servers:
+  - url: 'http://localhost:3100'
+    description: API Mockサーバー（stoplight studio）
+  - url: 'http://localhost:8280'
+    description: API Mockサーバー（container）
+  - url: 'http://develop:8280'
+    description: API Mockサーバー（development）
+  - url: 'http://localhost:8180'
+    description: DevelopAPIサーバー (local)
+  - url: 'http://develop:8180'
+    description: DevelopAPIサーバー (development)
+tags:
+  - name: aggregate
+    description: 集計
+  - name: datasets
+    description: データセット
+  - name: datastores
+    description: データストア
+  - name: cors
+    description: CORS
+paths:
+  /dd:
+    post:
+      tags:
+        - datasets
+      summary: データセット情報を登録（1件）
+      description: ヌルキャラクタで埋め尽くされたファイルを生成してダウンロードします（1件）
+      operationId: post-dd
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+        '503':
+          $ref: '#/components/responses/503-ServiceUnavailable'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dd'
+  /dds:
+    post:
+      tags:
+        - datasets
+      summary: データセット情報を登録（n件）
+      description: ヌルキャラクタで埋め尽くされたファイルを生成してダウンロードします（n件）
+      operationId: post-dds
+      responses:
+        '204':
+          description: No Content
+        '400':
+          $ref: '#/components/responses/400-BadRequest'
+        '500':
+          $ref: '#/components/responses/500-InternalServerError'
+        '503':
+          $ref: '#/components/responses/503-ServiceUnavailable'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dds'
+components:
+  schemas:
+    ErrorInfo:
+      type: object
+      description: エラーの情報
+      properties:
+        message:
+          type: string
+          maxLength: 256
+          minLength: 0
+        errors:
+          type: array
+          description: エラーの情報
+          items:
+            $ref: '#/components/schemas/Error'
+      required:
+        - message
+        - errors
+      x-examples:
+        1件:
+          fileName: 5mb.png
+          size: '5242880'
+    Error:
+      type: object
+      description: エラーの情報
+      properties:
+        key:
+          type: string
+          maxLength: 256
+          minLength: 0
+          description: クエリパラメータ名
+        reason:
+          type: string
+          maxLength: 256
+          minLength: 0
+          description: エラーの理由
+    Dd:
+      description: 生成するテストデータの情報を指定（1件）
+      type: object
+      x-examples:
+        例1:
+          fileName: 1kbyte.txt
+          size: 1000
+      properties:
+        fileName:
+          type: string
+          minLength: 1
+          maxLength: 256
+          description: ファイル名を指定します
+        size:
+          type: integer
+          description: ファイルサイズを指定します（byte指定）
+          minimum: 1000
+          maximum: 1073741824
+      required:
+        - fileName
+        - size
+    Dds:
+      title: Dds
+      type: array
+      description: 生成するテストデータの情報を指定（n件）
+      items:
+        $ref: '#/components/schemas/Dd'
+      x-examples:
+        "\b1件":
+          - fileName: 1kbyte.txt
+            size: 1000
+        n件:
+          - fileName: 3kbyte.txt
+            size: 3000
+          - fileName: 5kbyte.txt
+            size: 5000
+  parameters: {}
+  responses:
+    400-BadRequest:
+      description: リクエストが不正
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            message: リクエストが不正です
+            errors: []
+    500-InternalServerError:
+      description: サーバーエラーが発生
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            message: サーバーにエラーが発生しました
+            errors: []
+    503-ServiceUnavailable:
+      description: メンテナンス中
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorInfo'
+          example:
+            message: メンテナンス中です
+            errors: []

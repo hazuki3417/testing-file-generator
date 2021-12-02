@@ -1,0 +1,5 @@
+FROM stoplight/prism:4
+
+COPY ./dist/openapi/openapi.yaml /tmp/dist/
+
+CMD [ "mock", "-d", "-h", "0.0.0.0", "/tmp/dist/openapi.yaml" ]
