@@ -22,20 +22,13 @@ servers:
   - url: 'http://develop:8180'
     description: DevelopAPIサーバー (development)
 tags:
-  - name: aggregate
-    description: 集計
-  - name: datasets
-    description: データセット
-  - name: datastores
-    description: データストア
-  - name: cors
-    description: CORS
+  - name: /dev/zero
 paths:
   /dd:
     post:
       tags:
-        - datasets
-      summary: データセット情報を登録（1件）
+        - /dev/zero
+      summary: ダミーファイルを生成します（1件）
       description: ヌルキャラクタで埋め尽くされたファイルを生成してダウンロードします（1件）
       operationId: post-dd
       responses:
@@ -52,11 +45,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Dd'
+            examples:
+              例1:
+                value:
+                  fileName: 1kbyte.txt
+                  size: 1000
   /dds:
     post:
       tags:
-        - datasets
-      summary: データセット情報を登録（n件）
+        - /dev/zero
+      summary: ダミーファイルを生成します（n件）
       description: ヌルキャラクタで埋め尽くされたファイルを生成してダウンロードします（n件）
       operationId: post-dds
       responses:
@@ -73,6 +71,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Dds'
+            examples:
+              n件:
+                value:
+                  - fileName: 3kbyte.txt
+                    size: 3000
+                  - fileName: 5kbyte.txt
+                    size: 5000
+              1件:
+                value:
+                  - fileName: 1kbyte.txt
+                    size: 1000
 components:
   schemas:
     ErrorInfo:
@@ -112,16 +121,13 @@ components:
     Dd:
       description: 生成するテストデータの情報を指定（1件）
       type: object
-      x-examples:
-        例1:
-          fileName: 1kbyte.txt
-          size: 1000
       properties:
         fileName:
           type: string
           minLength: 1
           maxLength: 256
           description: ファイル名を指定します
+          pattern: '.*\.[a-zA-Z0-9]+$'
         size:
           type: integer
           description: ファイルサイズを指定します（byte指定）
@@ -136,15 +142,6 @@ components:
       description: 生成するテストデータの情報を指定（n件）
       items:
         $ref: '#/components/schemas/Dd'
-      x-examples:
-        "\b1件":
-          - fileName: 1kbyte.txt
-            size: 1000
-        n件:
-          - fileName: 3kbyte.txt
-            size: 3000
-          - fileName: 5kbyte.txt
-            size: 5000
   parameters: {}
   responses:
     400-BadRequest:

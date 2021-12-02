@@ -62,9 +62,9 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.prism
-    image: openapi-mock
-    hostname: openapi-mock
-    container_name: openapi-mock
+    image: testing-file-generator-mock
+    hostname: testing-file-generator-mock
+    container_name: testing-file-generator-mock
     ports:
       - "8280:4010"
     volumes:
@@ -75,9 +75,9 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile.rapidoc
-    image: openapi-document
-    hostname: openapi-document
-    container_name: openapi-document
+    image: testing-file-generator-document
+    hostname: testing-file-generator-document
+    container_name: testing-file-generator-document
     ports:
       - "8380:80"
     volumes:
