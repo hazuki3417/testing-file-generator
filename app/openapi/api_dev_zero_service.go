@@ -12,12 +12,13 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
+	"unicode/utf8"
 )
 
 // DevZeroApiService is a service that implents the logic for the DevZeroApiServicer
-// This service should implement the business logic for every endpoint for the DevZeroApi API. 
+// This service should implement the business logic for every endpoint for the DevZeroApi API.
 // Include any external packages or services that will be required by this service.
 type DevZeroApiService struct {
 }
@@ -29,22 +30,43 @@ func NewDevZeroApiService() DevZeroApiServicer {
 
 // PostDd - ダミーファイルを生成します（1件）
 func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, error) {
-	// TODO - update PostDd with the required logic for this service method.
-	// Add api_dev_zero_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
-	//return Response(204, nil),nil
+	fileNameLength := utf8.RuneCountInString(dd.FileName)
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorInfo{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorInfo{}), nil
+	if fileNameLength < 1 || 254 < fileNameLength {
+		// ファイル名の長さが不正
+		return Response(400, ErrorInfo{
+			Message: "リクエストが不正です",
+			Errors: []Error{
+				{
+					Key:    "fileName",
+					Reason: "ファイル名の長さが不正です",
+				},
+			},
+		}), errors.New("bad request")
+	}
+	// ファイル名が半角・全角スペースのみのときのバリデーションを追加
+	// TODO: バリデーション処理は切り出す
 
-	//TODO: Uncomment the next line to return response Response(500, ErrorInfo{}) or use other options such as http.Ok ...
-	//return Response(500, ErrorInfo{}), nil
+	// 1000byte
+	minSize := 1000
+	// 1GB（1k=1024byte計算）
+	maxSize := 1073741824
 
-	//TODO: Uncomment the next line to return response Response(503, ErrorInfo{}) or use other options such as http.Ok ...
-	//return Response(503, ErrorInfo{}), nil
+	if dd.Size < uint32(minSize) || maxSize < int(dd.Size) {
+		// ファイルサイズの指定が不正
+		return Response(400, ErrorInfo{
+			Message: "リクエストが不正です",
+			Errors: []Error{
+				{
+					Key:    "size",
+					Reason: "サイズ指定が不正です",
+				},
+			},
+		}), errors.New("bad request")
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("PostDd method not implemented")
+	return Response(204, nil), nil
 }
 
 // PostDds - ダミーファイルを生成します（n件）
@@ -66,4 +88,3 @@ func (s *DevZeroApiService) PostDds(ctx context.Context, dd []Dd) (ImplResponse,
 
 	return Response(http.StatusNotImplemented, nil), errors.New("PostDds method not implemented")
 }
-

@@ -14,6 +14,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
+
+	"github.com/hazuki3417/testing-file-generator/util"
 )
 
 // A DevZeroApiController binds http requests to an api service and writes the service results to the http response
@@ -52,14 +54,42 @@ func (c *DevZeroApiController) PostDd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.PostDd(r.Context(), *dd)
-	// If an error occurred, encode the error with the status code
+
 	if err != nil {
+		EncodeJSONResponse(result.Body, &result.Code, w)
+		return
+	}
+
+	// リクエストパラメータが正常な場合、以降の処理が実行される
+
+	fileName := dd.FileName
+
+	// 作業用ディレクトリ生成（リクエストタイム、ファイル名の重複を考慮）
+	workDir := util.WorkingDirectory{}
+	baseDirPath, err := workDir.Create()
+	defer workDir.Delete()
+
+	if err != nil {
+		// TODO: レスポンスを作成して返す。リザルトコードも変える
 		EncodeJSONResponse(err.Error(), &result.Code, w)
 		return
 	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
 
+	filePath := baseDirPath + "/" + fileName
+
+	// テストファイル生成
+	if err := util.GenerateTestingFile(filePath, dd.Size); err != nil {
+		// TODO: レスポンスを作成して返す。リザルトコードも変える
+		EncodeJSONResponse(err.Error(), &result.Code, w)
+		return
+	}
+
+	// テストファイルダウンロード
+	if DownloadFile(w, filePath) != nil {
+		// TODO: レスポンスを作成して返す。リザルトコードも変える
+		EncodeJSONResponse(err.Error(), &result.Code, w)
+		return
+	}
 }
 
 // PostDds - ダミーファイルを生成します（n件）
