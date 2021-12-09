@@ -14,7 +14,8 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"unicode/utf8"
+
+	"github.com/hazuki3417/testing-file-generator/validate"
 )
 
 // DevZeroApiService is a service that implents the logic for the DevZeroApiServicer
@@ -31,36 +32,50 @@ func NewDevZeroApiService() DevZeroApiServicer {
 // PostDd - ダミーファイルを生成します（1件）
 func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, error) {
 
-	fileNameLength := utf8.RuneCountInString(dd.FileName)
+	fileNameValidate := validate.StrValidate(dd.FileName)
+	if err := fileNameValidate.Valid(); err != nil {
+		// 有効なファイル名じゃない
+		return Response(400, ErrorInfo{
+			Message: "リクエストが不正です",
+			Errors: []Error{
+				{
+					Key:    "fileName",
+					Reason: err.Error(),
+				},
+			},
+		}), errors.New("bad request")
+	}
 
-	if fileNameLength < 1 || 254 < fileNameLength {
+	minLength := 1
+	maxLength := 254
+
+	if err := fileNameValidate.Between(minLength, maxLength); err != nil {
 		// ファイル名の長さが不正
 		return Response(400, ErrorInfo{
 			Message: "リクエストが不正です",
 			Errors: []Error{
 				{
 					Key:    "fileName",
-					Reason: "ファイル名の長さが不正です",
+					Reason: err.Error(),
 				},
 			},
 		}), errors.New("bad request")
 	}
-	// ファイル名が半角・全角スペースのみのときのバリデーションを追加
-	// TODO: バリデーション処理は切り出す
+
+	sizeValidate := validate.IntValidate(int(dd.Size))
 
 	// 1000byte
 	minSize := 1000
 	// 1GB（1k=1024byte計算）
 	maxSize := 1073741824
-
-	if dd.Size < uint32(minSize) || maxSize < int(dd.Size) {
+	if err := sizeValidate.Range(minSize, maxSize); err != nil {
 		// ファイルサイズの指定が不正
 		return Response(400, ErrorInfo{
 			Message: "リクエストが不正です",
 			Errors: []Error{
 				{
 					Key:    "size",
-					Reason: "サイズ指定が不正です",
+					Reason: err.Error(),
 				},
 			},
 		}), errors.New("bad request")
