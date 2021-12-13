@@ -32,18 +32,15 @@ func NewDevZeroApiService() DevZeroApiServicer {
 // PostDd - ダミーファイルを生成します（1件）
 func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, error) {
 
+	errorQueue := NewErrorQueue(5)
+
 	fileNameValidate := validate.StrValidate(dd.FileName)
 	if err := fileNameValidate.Valid(); err != nil {
 		// 有効なファイル名じゃない
-		return Response(400, ErrorInfo{
-			Message: "リクエストが不正です",
-			Errors: []Error{
-				{
-					Key:    "fileName",
-					Reason: err.Error(),
-				},
-			},
-		}), errors.New("bad request")
+		errorQueue.Enqueue(Error{
+			Key:    "fileName",
+			Reason: err.Error(),
+		})
 	}
 
 	minLength := 1
@@ -51,15 +48,10 @@ func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, er
 
 	if err := fileNameValidate.Between(minLength, maxLength); err != nil {
 		// ファイル名の長さが不正
-		return Response(400, ErrorInfo{
-			Message: "リクエストが不正です",
-			Errors: []Error{
-				{
-					Key:    "fileName",
-					Reason: err.Error(),
-				},
-			},
-		}), errors.New("bad request")
+		errorQueue.Enqueue(Error{
+			Key:    "fileName",
+			Reason: err.Error(),
+		})
 	}
 
 	sizeValidate := validate.IntValidate(int(dd.Size))
@@ -70,14 +62,16 @@ func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, er
 	maxSize := 1073741824
 	if err := sizeValidate.Range(minSize, maxSize); err != nil {
 		// ファイルサイズの指定が不正
+		errorQueue.Enqueue(Error{
+			Key:    "size",
+			Reason: err.Error(),
+		})
+	}
+
+	if errorQueue.IsNotEmpty() {
 		return Response(400, ErrorInfo{
 			Message: "リクエストが不正です",
-			Errors: []Error{
-				{
-					Key:    "size",
-					Reason: err.Error(),
-				},
-			},
+			Errors:  errorQueue.All(),
 		}), errors.New("bad request")
 	}
 
