@@ -13,6 +13,7 @@ package openapi
 import (
 	"encoding/json"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	"github.com/hazuki3417/testing-file-generator/util"
@@ -60,12 +61,8 @@ func (c *DevZeroApiController) PostDd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// リクエストパラメータが正常な場合、以降の処理が実行される
-
-	fileName := dd.FileName
-
 	// 作業用ディレクトリ生成（リクエストタイム、ファイル名の重複を考慮）
-	workDir := util.WorkingDirectory{}
+	workDir := util.WorkingDirectory{BaseDir: "/tmp/"}
 	baseDirPath, err := workDir.Create()
 	defer workDir.Delete()
 
@@ -75,7 +72,7 @@ func (c *DevZeroApiController) PostDd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	filePath := baseDirPath + "/" + fileName
+	filePath := filepath.Join(baseDirPath, dd.FileName)
 
 	// テストファイル生成
 	if err := util.GenerateTestingFile(filePath, dd.Size); err != nil {
