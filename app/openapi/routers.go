@@ -142,13 +142,14 @@ func DownloadFile(w http.ResponseWriter, filePath string) error {
 	}
 	defer f.Close()
 
+	if _, err := io.Copy(w, f); err != nil {
+		return err
+	}
+
 	disposition := "attachment; filename=" + fileName
 	w.Header().Set("Content-type", "application/octet-stream")
 	w.Header().Set("Content-Disposition", disposition)
 
-	if _, err := io.Copy(w, f); err != nil {
-		return err
-	}
 	return nil
 }
 
