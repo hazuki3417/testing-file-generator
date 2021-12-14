@@ -13,20 +13,23 @@ package openapi
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // A Route defines the parameters for an api endpoint
 type Route struct {
-	Name		string
-	Method	  string
-	Pattern	 string
+	Name        string
+	Method      string
+	Pattern     string
 	HandlerFunc http.HandlerFunc
 }
 
@@ -126,6 +129,26 @@ func readFileHeaderToTempFile(fileHeader *multipart.FileHeader) (*os.File, error
 	file.Write(fileBytes)
 
 	return file, nil
+}
+
+// 指定したファイルをhttpダウンロードさせる処理
+func DownloadFile(w http.ResponseWriter, filePath string) error {
+	fileName := filepath.Base(filePath)
+
+	f, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	disposition := "attachment; filename=" + fileName
+	w.Header().Set("Content-type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", disposition)
+
+	if _, err := io.Copy(w, f); err != nil {
+		return err
+	}
+	return nil
 }
 
 // parseInt64Parameter parses a string parameter to an int64.
