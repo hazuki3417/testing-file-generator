@@ -12,8 +12,8 @@ cp-openapi-skeleton-code: generate-openapi-skeleton-code
 generate-openapi-skeleton-code:
 	make -C ./../docs/openapi generate-api-skeleton
 
-# go-test:
-# 	go test -v \
-# 		./mongodb \
-# 		./openapi \
-# 		./validate
+go-test:
+	go test -v \
+		./verify \
+		./validate \
+		./util
