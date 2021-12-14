@@ -72,7 +72,7 @@ func (c *DevZeroApiController) PostDds(w http.ResponseWriter, r *http.Request) {
 	result, err := c.service.PostDds(r.Context(), *dds)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
+		EncodeJSONResponse(result.Body, &result.Code, w)
 		return
 	}
 	// If no error, encode the body and the result code
