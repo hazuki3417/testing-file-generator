@@ -12,8 +12,12 @@ package openapi
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"path/filepath"
 	"strings"
+
+	"github.com/hazuki3417/testing-file-generator/util"
 )
 
 // A DevZeroApiController binds http requests to an api service and writes the service results to the http response
@@ -70,12 +74,46 @@ func (c *DevZeroApiController) PostDds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.PostDds(r.Context(), *dds)
-	// If an error occurred, encode the error with the status code
+
 	if err != nil {
 		EncodeJSONResponse(result.Body, &result.Code, w)
 		return
 	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
 
+	// 作業用ディレクトリ生成（リクエストタイム、ファイル名の重複を考慮）
+	workDir := util.WorkingDirectory{BaseDir: "/tmp"}
+	baseDirPath, err := workDir.Create()
+	defer workDir.Delete()
+
+	if err != nil {
+		res := InternalServerError(err.Error())
+		EncodeJSONResponse(res.Body, &res.Code, w)
+		return
+	}
+
+	// zipFilePath := filepath.Join(baseDirPath, "zipFile.zip")
+
+	for _, spec := range dds.Specs {
+
+		// ファイル名をスタックする処理を追加
+		filePath := filepath.Join(baseDirPath, spec.FileName)
+
+		// テストファイル生成
+		if err := util.GenerateTestingFile(filePath, uint32(spec.Size)); err != nil {
+			res := InternalServerError(err.Error())
+			EncodeJSONResponse(res.Body, &res.Code, w)
+			return
+		}
+	}
+
+	// TODO: zip圧縮処理を実装
+	res := InternalServerError(errors.New("TODO: zip圧縮処理を実装").Error())
+	EncodeJSONResponse(res.Body, &res.Code, w)
+
+	// テストファイルダウンロード
+	// if DownloadFile(w, zipFilePath) != nil {
+	// 	res := InternalServerError(err.Error())
+	// 	EncodeJSONResponse(res.Body, &res.Code, w)
+	// 	return
+	// }
 }
