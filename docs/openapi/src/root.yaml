@@ -100,9 +100,7 @@ components:
       description: エラーの情報
       properties:
         message:
-          type: string
-          maxLength: 256
-          minLength: 0
+          $ref: '#/components/schemas/Error-Key-Message'
         errors:
           type: array
           description: エラーの情報
@@ -117,9 +115,7 @@ components:
       description: エラーの情報（複数データver）
       properties:
         message:
-          type: string
-          maxLength: 256
-          minLength: 0
+          $ref: '#/components/schemas/Error-Key-Message'
         errors:
           type: array
           description: エラーの情報
@@ -197,6 +193,13 @@ components:
             $ref: '#/components/schemas/Dd'
       required:
         - specs
+    Error-Key-Message:
+      type: string
+      title: Error-Key-Message
+      maxLength: 256
+      minLength: 0
+      description: エラー内容
+      default: リクエストが不正です
   parameters: {}
   responses:
     500-InternalServerError:
