@@ -1,11 +1,11 @@
 package openapi
 
-func InternalServerError() *ImplResponse {
-
+func InternalServerError(message string) *ImplResponse {
 	return &ImplResponse{
 		Code: 500,
 		Body: ErrorInfo{
-			Message: "サーバーエラーが発生しました",
+			Message: message,
+			Errors:  []Error{},
 		},
 	}
 }
