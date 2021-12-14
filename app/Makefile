@@ -3,6 +3,9 @@
 build-golang:
 	go build ./main.go
 
+run: build-golang
+	./main
+
 cp-openapi-skeleton-code: generate-openapi-skeleton-code
 	cp -rfv ./../docs/openapi/skeleton/go/* ./openapi/
 
