@@ -12,11 +12,11 @@ package openapi
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"path/filepath"
 	"strings"
 
+	"github.com/hazuki3417/testing-file-generator/datastructure/queue"
 	"github.com/hazuki3417/testing-file-generator/util"
 )
 
@@ -91,29 +91,21 @@ func (c *DevZeroApiController) PostDds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// zipFilePath := filepath.Join(baseDirPath, "zipFile.zip")
-
+	strQueue := queue.NewTypeString(10)
 	for _, spec := range dds.Specs {
-
-		// ファイル名をスタックする処理を追加
 		filePath := filepath.Join(baseDirPath, spec.FileName)
-
 		// テストファイル生成
 		if err := util.GenerateTestingFile(filePath, uint32(spec.Size)); err != nil {
 			res := InternalServerError(err.Error())
 			EncodeJSONResponse(res.Body, &res.Code, w)
 			return
 		}
+		strQueue.Enqueue(filePath)
 	}
 
-	// TODO: zip圧縮処理を実装
-	res := InternalServerError(errors.New("TODO: zip圧縮処理を実装").Error())
-	EncodeJSONResponse(res.Body, &res.Code, w)
-
-	// テストファイルダウンロード
-	// if DownloadFile(w, zipFilePath) != nil {
-	// 	res := InternalServerError(err.Error())
-	// 	EncodeJSONResponse(res.Body, &res.Code, w)
-	// 	return
-	// }
+	if err := DownloadZip(w, strQueue.All()); err != nil {
+		res := InternalServerError(err.Error())
+		EncodeJSONResponse(res.Body, &res.Code, w)
+		return
+	}
 }
