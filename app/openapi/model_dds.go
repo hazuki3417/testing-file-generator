@@ -10,12 +10,8 @@
 
 package openapi
 
-// ErrorInfo - エラーの情報
-type ErrorInfo struct {
+// Dds - 生成するテストデータの情報を指定（n件）
+type Dds struct {
 
-	// エラー内容
-	Message string `json:"message"`
-
-	// エラーの情報
-	Errors []Error `json:"errors"`
+	Specs []Dd `json:"specs"`
 }

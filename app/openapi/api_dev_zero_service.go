@@ -48,15 +48,15 @@ func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, er
 }
 
 // PostDds - ダミーファイルを生成します（n件）
-func (s *DevZeroApiService) PostDds(ctx context.Context, dd []Dd) (ImplResponse, error) {
+func (s *DevZeroApiService) PostDds(ctx context.Context, dds Dds) (ImplResponse, error) {
 	// TODO - update PostDds with the required logic for this service method.
 	// Add api_dev_zero_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
 	//TODO: Uncomment the next line to return response Response(204, {}) or use other options such as http.Ok ...
 	//return Response(204, nil),nil
 
-	//TODO: Uncomment the next line to return response Response(400, ErrorInfo{}) or use other options such as http.Ok ...
-	//return Response(400, ErrorInfo{}), nil
+	//TODO: Uncomment the next line to return response Response(400, ErrorInfoPosition{}) or use other options such as http.Ok ...
+	//return Response(400, ErrorInfoPosition{}), nil
 
 	//TODO: Uncomment the next line to return response Response(500, ErrorInfo{}) or use other options such as http.Ok ...
 	//return Response(500, ErrorInfo{}), nil

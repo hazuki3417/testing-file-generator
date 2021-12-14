@@ -32,5 +32,5 @@ type DevZeroApiRouter interface {
 // and updated with the logic required for the API.
 type DevZeroApiServicer interface { 
 	PostDd(context.Context, Dd) (ImplResponse, error)
-	PostDds(context.Context, []Dd) (ImplResponse, error)
+	PostDds(context.Context, Dds) (ImplResponse, error)
 }
