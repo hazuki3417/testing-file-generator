@@ -17,7 +17,7 @@ servers:
     description: API Mockサーバー（container）
   - url: 'http://develop:8280'
     description: API Mockサーバー（development）
-  - url: 'http://localhost:8180'
+  - url: 'http://localhost:8080'
     description: DevelopAPIサーバー (local)
   - url: 'http://develop:8180'
     description: DevelopAPIサーバー (development)
