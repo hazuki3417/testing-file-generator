@@ -54,9 +54,7 @@ func (s *DevZeroApiService) PostDds(ctx context.Context, dds Dds) (ImplResponse,
 
 	errorQueue := NewErrorPositionQueue(5)
 
-	specs := dds.Specs
-
-	for index, spec := range specs {
+	for index, spec := range dds.Specs {
 
 		fileNameValidate := validate.StrValidate(spec.FileName)
 		if err := fileNameValidate.Valid(); err != nil {
