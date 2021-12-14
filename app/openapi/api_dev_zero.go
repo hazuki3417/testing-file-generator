@@ -67,7 +67,7 @@ func (c *DevZeroApiController) PostDd(w http.ResponseWriter, r *http.Request) {
 	defer workDir.Delete()
 
 	if err != nil {
-		res := InternalServerError()
+		res := InternalServerError(err.Error())
 		EncodeJSONResponse(res.Body, &res.Code, w)
 		return
 	}
@@ -76,14 +76,14 @@ func (c *DevZeroApiController) PostDd(w http.ResponseWriter, r *http.Request) {
 
 	// テストファイル生成
 	if err := util.GenerateTestingFile(filePath, dd.Size); err != nil {
-		res := InternalServerError()
+		res := InternalServerError(err.Error())
 		EncodeJSONResponse(res.Body, &res.Code, w)
 		return
 	}
 
 	// テストファイルダウンロード
 	if DownloadFile(w, filePath) != nil {
-		res := InternalServerError()
+		res := InternalServerError(err.Error())
 		EncodeJSONResponse(res.Body, &res.Code, w)
 		return
 	}
