@@ -94,12 +94,12 @@ func (c *DevZeroApiController) PostDd(w http.ResponseWriter, r *http.Request) {
 
 // PostDds - ダミーファイルを生成します（n件）
 func (c *DevZeroApiController) PostDds(w http.ResponseWriter, r *http.Request) {
-	dd := &[]Dd{}
-	if err := json.NewDecoder(r.Body).Decode(&dd); err != nil {
+	dds := &Dds{}
+	if err := json.NewDecoder(r.Body).Decode(&dds); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	result, err := c.service.PostDds(r.Context(), *dd)
+	result, err := c.service.PostDds(r.Context(), *dds)
 	// If an error occurred, encode the error with the status code
 	if err != nil {
 		EncodeJSONResponse(err.Error(), &result.Code, w)

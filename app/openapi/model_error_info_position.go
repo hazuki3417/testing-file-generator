@@ -10,12 +10,12 @@
 
 package openapi
 
-// ErrorInfo - エラーの情報
-type ErrorInfo struct {
+// ErrorInfoPosition - エラーの情報（複数データver）
+type ErrorInfoPosition struct {
 
 	// エラー内容
 	Message string `json:"message"`
 
 	// エラーの情報
-	Errors []Error `json:"errors"`
+	Errors []ErrorPosition `json:"errors"`
 }

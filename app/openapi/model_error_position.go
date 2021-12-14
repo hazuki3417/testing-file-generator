@@ -10,8 +10,14 @@
 
 package openapi
 
-// Error - エラーの情報
-type Error struct {
+// ErrorPosition - エラーの情報（複数データver）
+type ErrorPosition struct {
+
+	// エラーの要素番号
+	Index int32 `json:"index"`
+
+	// エラーの階層
+	Depth int32 `json:"depth"`
 
 	// クエリパラメータ名
 	Key string `json:"key"`
