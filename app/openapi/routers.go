@@ -11,6 +11,7 @@
 package openapi
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"errors"
 	"io"
@@ -148,6 +149,36 @@ func DownloadFile(w http.ResponseWriter, filePath string) error {
 	if _, err := io.Copy(w, f); err != nil {
 		return err
 	}
+	return nil
+}
+
+func DownloadZip(w http.ResponseWriter, filePaths []string) error {
+	zipWriter := zip.NewWriter(w)
+	defer zipWriter.Close()
+
+	for _, filePath := range filePaths {
+		fs, err := os.Open(filePath)
+		if err != nil {
+			return err
+		}
+		defer fs.Close()
+
+		fileName := filepath.Base(filePath)
+
+		zw, err := zipWriter.Create(fileName)
+		if err != nil {
+			return err
+		}
+
+		if _, err := io.Copy(zw, fs); err != nil {
+			return err
+		}
+	}
+
+	disposition := "attachment; filename=testing-files.zip"
+	w.Header().Set("Content-type", "application/zip")
+	w.Header().Set("Content-Disposition", disposition)
+
 	return nil
 }
 
