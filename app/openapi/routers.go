@@ -149,6 +149,7 @@ func DownloadFile(w http.ResponseWriter, filePath string) error {
 	disposition := "attachment; filename=" + fileName
 	w.Header().Set("Content-type", "application/octet-stream")
 	w.Header().Set("Content-Disposition", disposition)
+	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
@@ -179,6 +180,7 @@ func DownloadZip(w http.ResponseWriter, filePaths []string) error {
 	disposition := "attachment; filename=testing-files.zip"
 	w.Header().Set("Content-type", "application/zip")
 	w.Header().Set("Content-Disposition", disposition)
+	w.WriteHeader(http.StatusNoContent)
 
 	return nil
 }
