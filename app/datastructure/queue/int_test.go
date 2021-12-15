@@ -59,6 +59,9 @@ func Test_IntQueue(t *testing.T) {
 	assert.EqualValues(t, queue.All(), []int{data3, data4, data5})
 	assert.EqualValues(t, queue.Size(), 0)
 
+	assert.EqualValues(t, queue.IsExists(data1), false)
 	queue.Enqueue(data1)
+	assert.EqualValues(t, queue.IsExists(data1), true)
 	queue.Denqueue()
+	assert.EqualValues(t, queue.IsExists(data1), false)
 }
