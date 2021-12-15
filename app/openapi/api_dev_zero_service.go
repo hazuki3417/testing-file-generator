@@ -15,6 +15,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/hazuki3417/testing-file-generator/datastructure/queue"
 	"github.com/hazuki3417/testing-file-generator/validate"
 )
 
@@ -53,6 +54,7 @@ func (s *DevZeroApiService) PostDd(ctx context.Context, dd Dd) (ImplResponse, er
 func (s *DevZeroApiService) PostDds(ctx context.Context, dds Dds) (ImplResponse, error) {
 
 	errorQueue := NewErrorPositionQueue(5)
+	strQueue := queue.NewTypeString(5)
 
 	for index, spec := range dds.Specs {
 
@@ -78,6 +80,17 @@ func (s *DevZeroApiService) PostDds(ctx context.Context, dds Dds) (ImplResponse,
 				Reason: err.Error(),
 			})
 		}
+
+		if strQueue.IsExists(spec.FileName) {
+			// ファイル名が重複
+			errorQueue.Enqueue(ErrorPosition{
+				Depth:  1,
+				Index:  int32(index),
+				Key:    "fileName",
+				Reason: "指定したファイル名はすでに存在します",
+			})
+		}
+		strQueue.Enqueue(spec.FileName)
 
 		sizeValidate := validate.IntValidate(int(spec.Size))
 
