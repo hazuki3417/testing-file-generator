@@ -33,6 +33,14 @@ func (q *intQueue) Size() int {
 	return len(q.data)
 }
 
+func (q *intQueue) IsExists(target int) bool {
+	for _, v := range q.data {
+		if v == target {
+			return true
+		}
+	}
+	return false
+}
 func (q *intQueue) IsEmpty() bool {
 	return q.Size() == 0
 }
