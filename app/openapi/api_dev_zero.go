@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/hazuki3417/testing-file-generator/datastructure/queue"
 	"github.com/hazuki3417/testing-file-generator/util"
 )
 
@@ -97,12 +98,38 @@ func (c *DevZeroApiController) PostDds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result, err := c.service.PostDds(r.Context(), *dds)
-	// If an error occurred, encode the error with the status code
+
 	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
+		EncodeJSONResponse(result.Body, &result.Code, w)
 		return
 	}
-	// If no error, encode the body and the result code
-	EncodeJSONResponse(result.Body, &result.Code, w)
 
+	// 作業用ディレクトリ生成（リクエストタイム、ファイル名の重複を考慮）
+	workDir := util.WorkingDirectory{BaseDir: "/tmp"}
+	baseDirPath, err := workDir.Create()
+	defer workDir.Delete()
+
+	if err != nil {
+		res := InternalServerError(err.Error())
+		EncodeJSONResponse(res.Body, &res.Code, w)
+		return
+	}
+
+	strQueue := queue.NewTypeString(10)
+	for _, spec := range dds.Specs {
+		filePath := filepath.Join(baseDirPath, spec.FileName)
+		// テストファイル生成
+		if err := util.GenerateTestingFile(filePath, uint32(spec.Size)); err != nil {
+			res := InternalServerError(err.Error())
+			EncodeJSONResponse(res.Body, &res.Code, w)
+			return
+		}
+		strQueue.Enqueue(filePath)
+	}
+
+	if err := DownloadZip(w, strQueue.All()); err != nil {
+		res := InternalServerError(err.Error())
+		EncodeJSONResponse(res.Body, &res.Code, w)
+		return
+	}
 }
