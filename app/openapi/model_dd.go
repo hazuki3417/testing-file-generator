@@ -17,5 +17,5 @@ type Dd struct {
 	FileName string `json:"fileName"`
 
 	// ファイルサイズを指定します（byte指定）
-	Size int32 `json:"size"`
+	Size uint32 `json:"size"`
 }
