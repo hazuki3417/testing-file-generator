@@ -11,22 +11,26 @@
 package openapi
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // A Route defines the parameters for an api endpoint
 type Route struct {
-	Name		string
-	Method	  string
-	Pattern	 string
+	Name        string
+	Method      string
+	Pattern     string
 	HandlerFunc http.HandlerFunc
 }
 
@@ -126,6 +130,59 @@ func readFileHeaderToTempFile(fileHeader *multipart.FileHeader) (*os.File, error
 	file.Write(fileBytes)
 
 	return file, nil
+}
+
+// 指定したファイルをhttpダウンロードさせる処理
+func DownloadFile(w http.ResponseWriter, filePath string) error {
+	fileName := filepath.Base(filePath)
+
+	f, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	if _, err := io.Copy(w, f); err != nil {
+		return err
+	}
+
+	disposition := "attachment; filename=" + fileName
+	w.Header().Set("Content-type", "application/octet-stream")
+	w.Header().Set("Content-Disposition", disposition)
+	w.WriteHeader(http.StatusNoContent)
+
+	return nil
+}
+
+func DownloadZip(w http.ResponseWriter, filePaths []string) error {
+	zipWriter := zip.NewWriter(w)
+	defer zipWriter.Close()
+
+	for _, filePath := range filePaths {
+		fs, err := os.Open(filePath)
+		if err != nil {
+			return err
+		}
+		defer fs.Close()
+
+		fileName := filepath.Base(filePath)
+
+		zw, err := zipWriter.Create(fileName)
+		if err != nil {
+			return err
+		}
+
+		if _, err := io.Copy(zw, fs); err != nil {
+			return err
+		}
+	}
+
+	disposition := "attachment; filename=testing-files.zip"
+	w.Header().Set("Content-type", "application/zip")
+	w.Header().Set("Content-Disposition", disposition)
+	w.WriteHeader(http.StatusNoContent)
+
+	return nil
 }
 
 // parseInt64Parameter parses a string parameter to an int64.
