@@ -22,9 +22,9 @@ test:
 generate-coverage: test
 	go tool cover -html=$(COVERAGE_FILE_PATH) -o $(COVERAGE_DIR)/index.html && rm $(COVERAGE_FILE_PATH)
 
-cp-openapi-skeleton-code: generate-openapi-skeleton-code
-	cp -rfv ./../docs/openapi/skeleton/go/* ./openapi/
-
 generate-openapi-skeleton-code:
 	make -C ./../docs/openapi generate-api-skeleton
+
+cp-openapi-skeleton-code: generate-openapi-skeleton-code
+	cp -rfv ./../docs/openapi/skeleton/go/* ./openapi/
 
