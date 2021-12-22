@@ -39,8 +39,8 @@ clean-api-skeleton:
 	find ./skeleton -depth 1 -not -name ".gitignore" | xargs rm -rfv
 
 build-openapi-mock:
-	docker-compose build --no-cache openapi-mock
+	docker-compose build --no-cache --force-rm openapi-mock
 
 build-openapi-document:
-	docker-compose build --no-cache openapi-document
+	docker-compose build --no-cache --force-rm openapi-document
 
