@@ -5,6 +5,7 @@ import (
 	"unicode/utf8"
 )
 
+// string型の値を検証する構造体です
 type StrVerify struct {
 	Value string
 }

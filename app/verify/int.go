@@ -1,5 +1,6 @@
 package verify
 
+// int型の値を検証する構造体です
 type IntVerify struct {
 	Value int
 }
