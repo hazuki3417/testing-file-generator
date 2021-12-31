@@ -1,0 +1,35 @@
+# 概要: リリース情報を作成するアクション
+
+name: Create Release Info
+on:
+  # NOTE: PRがマージされたときにワークフローを実行
+  #       https://qiita.com/okazy/items/7ab46f2c20ec341a2836
+  pull_request:
+    branches: [main]
+    types: [closed]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set GITHUB_ENV
+        run: |
+          echo ${{ github.event.pull_request.title }} | sed -E 's/release-v([0-9]+.[0-9]+.[0-9]+)/RELEASE_VERSION=\1/i' >> $GITHUB_ENV
+
+      - name: Check Release Version
+        run: echo ${{ env.RELEASE_VERSION }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Create Release Information
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_FOR_GITHUB }}
+        with:
+          tag_name: v${{ env.RELEASE_VERSION }}
+          release_name: ${{ env.RELEASE_VERSION }}
+          # body: ボディ
+          draft: false
+          prerelease: false
