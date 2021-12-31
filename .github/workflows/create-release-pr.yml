@@ -26,7 +26,7 @@ jobs:
           ref: ${{ env.BASE_BRANCH }}
 
         # 差分を発生させるためにci/cdのハッシュを保持する
-      - run: echo ${{ $GITHUB_SHA }} > release_hash
+      - run: echo $GITHUB_SHA > release_hash
       
         # TODO: ここでリリースノートの作成などをおこなう
 
