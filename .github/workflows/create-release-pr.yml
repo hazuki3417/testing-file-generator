@@ -1,0 +1,43 @@
+# 概要: リリースブランチのPRを作成するアクション
+
+name: Create Release PR
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+
+jobs:
+  create-release-pr:
+    runs-on: ubuntu-latest
+    env:
+      BASE_BRANCH: main
+
+    steps:
+        # セマンティックバージョンのフォーマット検証（簡易版）
+        # 厳密なものは下記のサイトの正規表現で行うこと
+        # https://semver.org/
+      - name: Verify semver
+        run:  echo "${{ github.event.inputs.version }}" | grep -e ^\[0-9\]\\+.\[0-9\]\\+.\[0-9\]\\+$
+
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+
+        # 差分を発生させるためにci/cdのハッシュを保持する
+      - run: echo ${{ $GITHUB_SHA }} > release_hash
+      
+        # TODO: ここでリリースノートの作成などをおこなう
+
+      # document: https://github.com/marketplace/actions/create-pull-request
+      - name: Create a release pull request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          title: Release-v${{ github.event.inputs.version }}
+          labels: Release PR
+          branch: release-v${{ github.event.inputs.version }}
+          token: ${{ secrets.PAT_FOR_GITHUB }}
+          delete-branch: true
+        # 変更がないとブランチは作成されないので注意
+        # このブランチがクローズ（却下されたときの処理も作成する）
