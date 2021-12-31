@@ -1,7 +1,14 @@
-name: pr-testing-backend
+# 概要: バックエンドのリグレッションテストを行うアクション
+
+name: Testing Backend
 on:
+  # NOTE: PR作成時は常にテストを実行
   pull_request:
-    branches: [ feature-backend ]
+    branches: [main, 'release*', 'feature*']
+  # NOTE: 機能実装ブランチに変更が発生したときは常にテストを実行
+  push:
+    branches: ['feature*']
+  workflow_dispatch:
 
 jobs:
   tests:
