@@ -22,15 +22,15 @@ build: generate-api-document
 
 # タスク処理
 validate-openapi-document:
-	docker-compose run validate-openapi-document
+	docker-compose run --rm validate-openapi-document
 
 generate-openapi-document:
 	make clean-api-document
-	docker-compose run generate-openapi-document
+	docker-compose run --rm generate-openapi-document
 
 generate-openapi-skeleton:
 	make clean-api-skeleton
-	docker-compose run generate-openapi-skeleton
+	docker-compose run --rm generate-openapi-skeleton
 
 clean-api-document:
 	find ./dist -depth 1 -not -name ".gitignore" | xargs rm -rfv
@@ -39,8 +39,8 @@ clean-api-skeleton:
 	find ./skeleton -depth 1 -not -name ".gitignore" | xargs rm -rfv
 
 build-openapi-mock:
-	docker-compose build --no-cache openapi-mock
+	docker-compose build --no-cache --force-rm openapi-mock
 
 build-openapi-document:
-	docker-compose build --no-cache openapi-document
+	docker-compose build --no-cache --force-rm openapi-document
 

@@ -17,7 +17,7 @@ servers:
     description: API Mockサーバー（container）
   - url: 'http://develop:8280'
     description: API Mockサーバー（development）
-  - url: 'http://localhost:8180'
+  - url: 'http://localhost:8080'
     description: DevelopAPIサーバー (local)
   - url: 'http://develop:8180'
     description: DevelopAPIサーバー (development)
@@ -35,7 +35,11 @@ paths:
         '204':
           description: No Content
         '400':
-          $ref: '#/components/responses/400-BadRequest'
+          description: リクエストが不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfo'
         '500':
           $ref: '#/components/responses/500-InternalServerError'
         '503':
@@ -61,7 +65,12 @@ paths:
         '204':
           description: No Content
         '400':
-          $ref: '#/components/responses/400-BadRequest'
+          description: リクエストが不正
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorInfoPosition'
+              examples: {}
         '500':
           $ref: '#/components/responses/500-InternalServerError'
         '503':
@@ -74,14 +83,16 @@ paths:
             examples:
               n件:
                 value:
-                  - fileName: 3kbyte.txt
-                    size: 3000
-                  - fileName: 5kbyte.txt
-                    size: 5000
+                  specs:
+                    - fileName: 3kbyte.txt
+                      size: 3000
+                    - fileName: 5kbyte.txt
+                      size: 5000
               1件:
                 value:
-                  - fileName: 1kbyte.txt
-                    size: 1000
+                  specs:
+                    - fileName: 1kbyte.txt
+                      size: 1000
 components:
   schemas:
     ErrorInfo:
@@ -89,21 +100,31 @@ components:
       description: エラーの情報
       properties:
         message:
-          type: string
-          maxLength: 256
-          minLength: 0
+          $ref: '#/components/schemas/Error-Key-Message'
         errors:
           type: array
           description: エラーの情報
+          uniqueItems: true
           items:
             $ref: '#/components/schemas/Error'
       required:
         - message
         - errors
-      x-examples:
-        1件:
-          fileName: 5mb.png
-          size: '5242880'
+    ErrorInfoPosition:
+      type: object
+      description: エラーの情報（複数データver）
+      properties:
+        message:
+          $ref: '#/components/schemas/Error-Key-Message'
+        errors:
+          type: array
+          description: エラーの情報
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/ErrorPosition'
+      required:
+        - message
+        - errors
     Error:
       type: object
       description: エラーの情報
@@ -118,6 +139,29 @@ components:
           maxLength: 256
           minLength: 0
           description: エラーの理由
+      required:
+        - key
+        - reason
+    ErrorPosition:
+      description: エラーの情報（複数データver）
+      allOf:
+        - type: object
+          properties:
+            index:
+              type: integer
+              minimum: 0
+              default: 0
+              description: エラーの要素番号
+              exclusiveMinimum: false
+            depth:
+              type: integer
+              description: エラーの階層
+              default: 0
+              minimum: 0
+          required:
+            - index
+            - depth
+        - $ref: '#/components/schemas/Error'
     Dd:
       description: 生成するテストデータの情報を指定（1件）
       type: object
@@ -133,26 +177,31 @@ components:
           description: ファイルサイズを指定します（byte指定）
           minimum: 1000
           maximum: 1073741824
+          default: 1000
       required:
         - fileName
         - size
     Dds:
       title: Dds
-      type: array
+      type: object
       description: 生成するテストデータの情報を指定（n件）
-      items:
-        $ref: '#/components/schemas/Dd'
+      properties:
+        specs:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Dd'
+      required:
+        - specs
+    Error-Key-Message:
+      type: string
+      title: Error-Key-Message
+      maxLength: 256
+      minLength: 0
+      description: エラー内容
+      default: リクエストが不正です
   parameters: {}
   responses:
-    400-BadRequest:
-      description: リクエストが不正
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ErrorInfo'
-          example:
-            message: リクエストが不正です
-            errors: []
     500-InternalServerError:
       description: サーバーエラーが発生
       content:

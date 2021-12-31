@@ -1,0 +1,12 @@
+version: "3.0"
+
+services:
+  testing-file-generator-api:
+    build:
+      context: ./
+      dockerfile: dockerfiles/Dockerfile.api
+    image: testing-file-generator-api
+    hostname: testing-file-generator-api
+    container_name: testing-file-generator-api
+    ports:
+      - "8080:8080"
