@@ -1,0 +1,63 @@
+
+
+name: Publish Image
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy-api-image-dh:
+    runs-on: ubuntu-latest
+    env:
+      BASE_BRANCH: main
+      IMAGE_OWNER: hazuki3417
+      IMAGE_NAME: testing-file-generator-api
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+
+      - name: Set GITHUB_ENV
+        run: |
+          echo ${{ github.event.release.tag_name }} | sed -E 's/v([0-9]+.[0-9]+.[0-9]+)/RELEASE_VERSION=\1/i' >> $GITHUB_ENV
+
+      - name: Build image
+        run: make build -e IMAGE_NAME=${{ env.IMAGE_NAME }}
+
+      - name: Set image tag
+        run: make set-tag-dh -e IMAGE_OWNER=${{ env.IMAGE_OWNER }} IMAGE_NAME=${{ env.IMAGE_NAME }} RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+
+      - name: Login Docker Hub
+        run: make login-dh -e PAT_DOCKERHUB=${{ secrets.PAT_FOR_DOCKERHUB }} DOCKERHUB_USER=${{ env.IMAGE_OWNER }}
+
+      - name: Push Docker Hub Registry
+        run: make push-dh -e IMAGE_OWNER=${{ env.IMAGE_OWNER }} IMAGE_NAME=${{ env.IMAGE_NAME }} RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+
+  deploy-api-image-ghcr:
+    runs-on: ubuntu-latest
+    env:
+      BASE_BRANCH: main
+      IMAGE_OWNER: hazuki3417
+      IMAGE_NAME: testing-file-generator-api
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BASE_BRANCH }}
+
+      - name: Set GITHUB_ENV
+        run: |
+          echo ${{ github.event.release.tag_name }} | sed -E 's/v([0-9]+.[0-9]+.[0-9]+)/RELEASE_VERSION=\1/i' >> $GITHUB_ENV
+
+      - name: Build image
+        run: make build -e IMAGE_NAME=${{ env.IMAGE_NAME }}
+
+      - name: Set image tag
+        run: make set-tag-ghcr -e IMAGE_OWNER=${{ env.IMAGE_OWNER }} IMAGE_NAME=${{ env.IMAGE_NAME }} RELEASE_VERSION=${{ env.RELEASE_VERSION }}
+
+      - name: Login GitHub Container Registry
+        run: make login-ghcr -e PAT_DOCKERHUB=${{ secrets.PAT_FOR_DOCKERHUB }} DOCKERHUB_USER=${{ env.IMAGE_OWNER }}
+
+      - name: Push GitHub Container Registry
+        run: make push-ghcr -e IMAGE_OWNER=${{ env.IMAGE_OWNER }} IMAGE_NAME=${{ env.IMAGE_NAME }} RELEASE_VERSION=${{ env.RELEASE_VERSION }}
