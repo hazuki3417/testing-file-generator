@@ -10,3 +10,19 @@ services:
     container_name: testing-file-generator-api
     ports:
       - "8080:8080"
+
+  testing-file-generator-web:
+    # build:
+    #   context: ./
+    #   dockerfile: dockerfiles/Dockerfile.web
+    # image: testing-file-generator-web
+    image: nginx:latest
+    hostname: testing-file-generator-web
+    container_name: testing-file-generator-web
+    ports:
+      - target: 80
+        published: 8000
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./public:/usr/share/nginx/html
