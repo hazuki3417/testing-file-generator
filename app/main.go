@@ -15,6 +15,7 @@ import (
 	"net/http"
 
 	"github.com/hazuki3417/testing-file-generator/openapi"
+	"github.com/rs/cors"
 )
 
 func main() {
@@ -24,6 +25,7 @@ func main() {
 	DevZeroApiController := openapi.NewDevZeroApiController(DevZeroApiService)
 
 	router := openapi.NewRouter(DevZeroApiController)
+	handler := cors.AllowAll().Handler(router)
 
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
