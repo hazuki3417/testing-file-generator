@@ -57,7 +57,7 @@ jobs:
         run: make set-tag-ghcr -e IMAGE_OWNER=${{ env.IMAGE_OWNER }} IMAGE_NAME=${{ env.IMAGE_NAME }} RELEASE_VERSION=${{ env.RELEASE_VERSION }}
 
       - name: Login GitHub Container Registry
-        run: make login-ghcr -e PAT_DOCKERHUB=${{ secrets.PAT_FOR_DOCKERHUB }} DOCKERHUB_USER=${{ env.IMAGE_OWNER }}
+        run: make login-ghcr -e PAT_GITHUB=${{ secrets.PAT_FOR_GITHUB }} GITHUB_USER=${{ env.IMAGE_OWNER }}
 
       - name: Push GitHub Container Registry
         run: make push-ghcr -e IMAGE_OWNER=${{ env.IMAGE_OWNER }} IMAGE_NAME=${{ env.IMAGE_NAME }} RELEASE_VERSION=${{ env.RELEASE_VERSION }}
