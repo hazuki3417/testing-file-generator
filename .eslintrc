@@ -1,0 +1,25 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "prettier",
+    "react-hooks"
+  ],
+  "extends": [
+    "prettier",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    // prettierの設定は.prettierrc.json側で設定する
+    "prettier/prettier": "error",
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "warn" // Checks effect dependencies
+  },
+  "ignorePatterns": [
+    "public"
+    // "database"
+  ]
+}
