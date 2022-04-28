@@ -12,11 +12,10 @@ services:
       - "8080:8080"
 
   testing-file-generator-web:
-    # build:
-    #   context: ./
-    #   dockerfile: dockerfiles/Dockerfile.web
-    # image: testing-file-generator-web
-    image: nginx:latest
+    build:
+      context: ./
+      dockerfile: dockerfiles/Dockerfile.web
+    image: testing-file-generator-web
     hostname: testing-file-generator-web
     container_name: testing-file-generator-web
     ports:

@@ -102,6 +102,20 @@ upload-document-api-reference:
 	aws s3 cp docs/openapi/dist/openapi/openapi.yaml s3://${S3_BUCKET_NAME}/api-reference/ && \
 	aws s3 cp docs/openapi/rapidoc/index.html s3://${S3_BUCKET_NAME}/api-reference/
 
+################################################################################
+# docker デーモン
+################################################################################
+start-api:
+	docker-compose up -d testing-file-generator-api
+
+start-web:
+	docker-compose up -d testing-file-generator-web
+
+stop-api:
+	docker-compose stop testing-file-generator-api
+
+stop-web:
+	docker-compose stop testing-file-generator-web
 
 
 
