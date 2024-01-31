@@ -4,24 +4,26 @@ services:
   testing-file-generator-api:
     build:
       context: ./
-      dockerfile: dockerfiles/Dockerfile.api
+      dockerfile: docker/testing-file-generator-api/Dockerfile
     image: testing-file-generator-api
     hostname: testing-file-generator-api
     container_name: testing-file-generator-api
     ports:
-      - "8080:8080"
+      - "8020:8080"
 
-  testing-file-generator-web:
-    build:
-      context: ./
-      dockerfile: dockerfiles/Dockerfile.web
-    image: testing-file-generator-web
-    hostname: testing-file-generator-web
-    container_name: testing-file-generator-web
+  openapi-document:
+    image: nginx:alpine
     ports:
-      - target: 80
-        published: 8000
-        protocol: tcp
-        mode: host
+      - "8000:80"
     volumes:
-      - ./public:/usr/share/nginx/html
+      - ./openapi/reference/root.yaml:/usr/share/nginx/html/openapi.yaml
+      - ./docs/repidoc/index.html:/usr/share/nginx/html/index.html
+
+  openapi-mock:
+    image: stoplight/prism
+    ports:
+      - "8010:4010"
+    volumes:
+      - ./openapi:/tmp/dist
+    command: mock -d -h 0.0.0.0 /tmp/dist/reference/root.yaml
+
