@@ -1,5 +1,0 @@
-FROM nginx:alpine
-
-ARG DOCUMENT_ROOT=/usr/share/nginx/html
-COPY ./rapidoc/index.html ${DOCUMENT_ROOT}
-COPY ./dist/openapi/openapi.yaml ${DOCUMENT_ROOT}
